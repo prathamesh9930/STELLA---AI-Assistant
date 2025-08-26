@@ -1,6 +1,8 @@
 
 
+
 # Stella AI Assistant
+
 
 <p align="center">
 	<img src="https://img.shields.io/badge/LLM%20Engine-Ollama-4B275F?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama"/>
@@ -51,6 +53,13 @@
 See `requirements.txt` for the full list.
 
 ---
+## 🖼️ Screenshots
+
+### Desktop
+<img src="sc/Screenshot%202025-08-27%20005319.png" alt="Stella AI Desktop" width="80%"/>
+
+### Mobile
+<img src="sc/WhatsApp%20Image%202025-08-27%20at%2012.59.57%20AM.jpeg" alt="Stella AI Mobile" width="40%"/>
 
 ---
 
