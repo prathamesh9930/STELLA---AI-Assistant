@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+venv311/
+ENV/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# Mac/Linux system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# Test/coverage
+htmlcov/
+.coverage
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Misc
+*.swp
+*.bak
+*.tmp
