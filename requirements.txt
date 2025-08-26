@@ -45,6 +45,16 @@
 # Core dependencies for Stella AI
 
 
+torch  # Install with the official command if this fails: https://pytorch.org/get-started/locally/
+transformers
+scikit-learn
+numpy
+pandas
+flask
+pyautogui
+vosk
+pyttsx3
+# or whisper (if using speech-to-text)
 # Backend
 torch  # Install with the official command if this fails: https://pytorch.org/get-started/locally/
 transformers
@@ -55,6 +65,7 @@ flask
 pyautogui
 vosk
 pyttsx3
+gTTS
 # or whisper (if using speech-to-text)
 
 # Frontend (if using React, install via npm separately)
