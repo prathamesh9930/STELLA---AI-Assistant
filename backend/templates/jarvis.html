@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Stella</title>
+<style>
+  :root{
+    --bg1:#060a12; --bg2:#001c2a; --bg3:#032a3e;
+    --cyan:#00eaff; --cyan-d:#00b7cc; --red:#ff3b3b; --white:#e6f7ff;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;
+    width:100vw;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    padding:0;
+    margin:0;
+  }
+  body{
+    margin:0; color:var(--white); font-family:ui-sans-serif,system-ui,Segoe UI,Helvetica,Arial;
+  background: url('https://wallpapercave.com/wp/wp8280633.jpg') center center/cover no-repeat fixed;
+    overflow:hidden;
+  }
+  .stage{position:relative; width:100%; height:100%;}
+  .glow {position:absolute; inset:-10%; background: radial-gradient(circle at 50% 40%, #00eaff15, transparent 60%); filter: blur(40px); z-index:0;}
+
+  /* Desktop layout */
+  #desktop {display:flex; align-items:center; justify-content:center; height:100%; padding:3vmin;}
+  .desk-wrap{position:relative; width:min(1200px, 92vw); height:min(700px, 86vh); display:grid; grid-template-rows: 1fr auto; gap:18px;}
+  .reactor-wrap{
+    display:flex; align-items:center; justify-content:center; position:relative;
+    /* background removed, now handled by body */
+    /* border-radius and box-shadow removed */
+    overflow: visible;
+  }
+  .reactor{width:min(60vmin, 520px); aspect-ratio:1/1; position:relative; filter: drop-shadow(0 0 20px #00d4ff55)}
+  .reactor svg{width:100%; height:100%; overflow:visible}
+
+  /* Console */
+  .console{
+    background: linear-gradient(180deg, #0b1524cc, #0a1220aa);
+    border:1px solid #0e2a3a; border-radius:18px; padding:14px;
+    display:flex; gap:12px; align-items:center;
+    box-shadow: 0 10px 40px #00000080, inset 0 0 40px #00b7cc11;
+    backdrop-filter: blur(6px);
+  }
+  .console input{
+    flex:1; background:#06111e; color:var(--white); border:1px solid #0f3750; border-radius:12px;
+    padding:14px 16px; font-size:16px; outline:none;
+    box-shadow: inset 0 0 20px #00eaff0a;
+  }
+  .btn{
+    border:none; border-radius:12px; padding:12px 16px; cursor:pointer; font-weight:600; color:#03131a;
+    background: linear-gradient(180deg, #8ef0ff, #42cfff); box-shadow: 0 6px 20px #00d4ff44;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-small {
+    font-size: 15px;
+    padding: 6px 10px !important;
+    min-width: 0;
+    width: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #00d4ff22;
+  }
+  #status{font-size:14px; opacity:.85; margin-left:6px}
+  #transcript{margin-top:8px; font-size:14px; color:#bfefff}
+
+  /* Mobile layout */
+  #mobile {
+    display:none;
+    height:100vh;
+    width:100vw;
+    min-width:0;
+    min-height:0;
+    padding:0;
+    margin:0;
+    overflow:hidden;
+  }
+  .m-col{
+    display:block;
+    position:relative;
+    height:100vh;
+    width:100vw;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    margin:0;
+    padding:0;
+  }
+  .m-reactor{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translate(-50%,0);
+    width:100vw;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
+    pointer-events:none;
+    /* background removed, now handled by body */
+    /* border-radius and box-shadow removed */
+    overflow: visible;
+  }
+  .m-reactor .reactor{
+    pointer-events:auto;
+  }
+  .m-reactor .reactor{
+    width:100vw;
+    height:100vh;
+    max-width:100vw;
+    max-height:100vh;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .sheet{
+    background:linear-gradient(180deg, #0c1525cc, #0a1220aa); border:1px solid #0e2a3a;
+    border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px; overflow:auto;
+    backdrop-filter: blur(6px);
+    min-height: 60px;
+    max-height: 38vh;
+    margin-top: 10px;
+    transition: max-height 0.4s cubic-bezier(.4,1.4,.6,1), min-height 0.4s cubic-bezier(.4,1.4,.6,1);
+  }
+  .row{display:flex; gap:10px}
+  .sheet input{flex:1; background:#06111e; color:#fff; border:1px solid #0f3750; border-radius:12px; padding:12px 14px}
+  .log{
+    white-space:pre-wrap;
+    font-size:14px;
+    color:#bfefff;
+    line-height:1.6;
+  }
+  @media (max-width: 768px){
+    #desktop{display:none}
+    #mobile{display:block}
+    .m-reactor { margin-bottom: 0; }
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 56px;
+      margin: 0 auto;
+      width: 98vw;
+      max-width: 600px;
+      z-index: 20;
+      box-shadow: 0 -2px 24px #00000044;
+      max-height: 32vh;
+      overflow-y: auto;
+    }
+    .m-col { justify-content: flex-end; }
+  }
+
+  @media (max-width: 480px){
+    .m-reactor .reactor {
+      width: 110vw;
+      height: 110vw;
+      max-width: 110vw;
+      max-height: 110vw;
+      min-width: 0;
+      min-height: 0;
+    }
+    .m-reactor {
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 0);
+      position: absolute;
+    }
+    .sheet {
+    max-height: 30vh !important;
+    min-height: 20px;
+    margin-top: 32vh;
+    overflow-y: auto;
+}
+    .sheet {
+      width: 99vw;
+      max-width: 99vw;
+      min-width: 0;
+      padding: 8px 4px;
+      font-size: 15px;
+      border-radius: 12px;
+    }
+    .row input, .row button {
+      font-size: 15px;
+      padding: 10px 8px;
+    }
+    .log {
+      font-size: 13px;
+    }
+  }
+
+  /* =========================
+     INTRO FLY-IN (SEQUENTIAL)
+     ========================= */
+.ring {
+  transform-box: fill-box;      /* makes origin relative to the ring */
+  transform-origin: center;     /* NOT 200px 200px */
+  opacity: 1;
+  animation-fill-mode: forwards;
+}
+
+
+  /* Remove fly-in animation and keyframes */
+
+  /* Apply desktop .reactor CSS to mobile as well */
+  .reactor, .m-reactor .reactor {
+    width:min(60vmin, 520px);
+    aspect-ratio:1/1;
+    position:relative;
+    filter: drop-shadow(0 0 20px #00d4ff55)
+  }
+  .reactor svg, .m-reactor .reactor svg {
+    width:100%;
+    height:100%;
+    overflow:visible;
+  }
+
+
+
+
+  /* =========================
+     SPIN (ADDED AFTER ASSEMBLY)
+     ========================= */
+  .spin-slow { animation: spin 16s linear infinite; }
+.spin-mid  { animation: spin 10s linear infinite reverse; }
+.spin-fast { animation: spin  6s linear infinite; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+
+
+
+  /* =========================
+     IMPACT + SHOCKWAVE
+     ========================= */
+  .impact { animation: impactPulse .6s ease-out; }
+  @keyframes impactPulse {
+    0%{transform:scale(1)}
+    40%{transform:scale(1.20)}
+    100%{transform:scale(1)}
+  }
+
+  /* shockwave is an HTML layer sitting above the SVG */
+  .shockwave {
+  position:absolute;
+  left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(0.2);
+  width:400px; height:400px;
+  border-radius:50%;
+  border:4px solid var(--cyan);
+  background: radial-gradient(circle, rgba(0,234,255,0.4) 0%, transparent 70%);
+  box-shadow: 0 0 40px #00eaffcc, inset 0 0 30px #00eaff99;
+  opacity:0;
+  z-index:5;   /* 👈 ensure it shows on top of reactor */
+  pointer-events:none;
+}
+
+  .shockwave-animate { animation: shockwaveExpand 1s ease-out; }
+  @keyframes shockwaveExpand {
+  0%  { transform:translate(-50%,-50%) scale(0.2); opacity:.9; }
+  60% { transform:translate(-50%,-50%) scale(2.5); opacity:.5; }
+  100%{ transform:translate(-50%,-50%) scale(4);   opacity:0; }
+}
+
+
+  /* Core pulse */
+  .pulse-core { animation:pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse{
+    0%,100%{filter:drop-shadow(0 0 12px #ff3b3b55)}
+    50%{filter:drop-shadow(0 0 28px #ff3b3b)}
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="glow"></div>
+
+  <!-- DESKTOP -->
+  <section id="desktop">
+    <div class="desk-wrap" style="display: flex; flex-direction: row; height: 100%;">
+      <div style="flex: 2; display: flex; flex-direction: column;">
+        <div class="reactor-wrap">
+          <div id="reactor" class="reactor">
+            <!-- Shockwave overlay (desktop) -->
+            <div class="shockwave" id="shockwave"></div>
+            <!-- Reactor SVG (desktop) -->
+            <svg viewBox="0 0 400 400" aria-hidden="true">
+              <defs>
+                <radialGradient id="cyanGrad" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#00eaff" stop-opacity="1"/>
+                  <stop offset="100%" stop-color="#00eaff" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <circle cx="200" cy="200" r="160" fill="url(#cyanGrad)" opacity="0.12"/>
+              <!-- Rings (fly-in first; spin classes added later by JS) -->
+              <g id="ring1" class="ring fly-in-top">
+                <circle cx="200" cy="200" r="140" fill="none" stroke="#00eaff55" stroke-width="3" stroke-dasharray="40 18 10 18"/>
+              </g>
+              <g id="ring2" class="ring fly-in-left">
+                <circle cx="200" cy="200" r="110" fill="none" stroke="#00eaffaa" stroke-width="4" stroke-dasharray="70 35"/>
+              </g>
+              <g id="ring3" class="ring fly-in-right">
+                <circle cx="200" cy="200" r="80"  fill="none" stroke="#7ff3ff"   stroke-width="3" stroke-dasharray="26 14"/>
+              </g>
+              <g id="ring4" class="ring fly-in-bottom">
+                <circle cx="200" cy="200" r="55"  fill="none" stroke="#ff3b3b"   stroke-width="7" stroke-dasharray="2 12" stroke-linecap="round"/>
+              </g>
+              <!-- Core -->
+              <circle cx="200" cy="200" r="14" fill="#ff3b3b" class="pulse-core">
+                <animate attributeName="r" values="12;14;12" dur="1.8s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+        </div>
+        <div id="thinking-card" style="display:none; background:#0b1524cc; border:1px solid #00eaff; color:#00eaff; border-radius:14px; padding:16px; margin-bottom:10px; font-size:16px; box-shadow:0 2px 16px #00eaff22;">
+          <span id="thinking-label">Thinking…</span>
+          <div id="thinking-question" style="margin-top:6px; color:#e6f7ff; font-size:15px;"></div>
+          <div id="thinking-model" style="margin-top:8px; color:#00eaff; font-size:14px;"></div>
+        </div>
+        <div class="console">
+          <button id="mic" class="btn">🎤 Speak</button>
+          <input id="text" placeholder="Ask Stella anything…" />
+          <select id="model-select" style="margin:0 8px; border-radius:8px; padding:8px;">
+            <option value="conversation">Llama3 (General)</option>
+            <option value="coding">DeepSeek Coder (Coding)</option>
+            <option value="fast" selected>Mistral (Fast)</option>
+            <option value="balanced">Olmo2 (Balanced)</option>
+<script>
+// Set Mistral (Fast) as default model for mobile
+if (window.innerWidth <= 768) {
+  const modelSelect = document.getElementById('model-select');
+  if (modelSelect) modelSelect.value = 'fast';
+}
+</script>
+          </select>
+          <button id="send" class="btn">➤ Send</button>
+          <span id="status">Ready</span>
+        </div>
+        <div id="transcript"></div>
+      </div>
+      <div id="code-card" style="display:none; flex: 1; margin-left: 24px; background:#06111e; border:1px solid #00eaff; border-radius:14px; padding:16px; color:#e6f7ff; font-size:15px; box-shadow:0 2px 16px #00eaff22; overflow:auto; max-width: 480px; min-width: 220px;">
+        <div style="font-weight:600; color:#00eaff; margin-bottom:8px;">Code Output</div>
+        <pre id="code-output" style="white-space:pre-wrap; color:#bfefff; background:none; border:none; font-size:14px; margin:0;"></pre>
+        <div style="margin-top:12px;">
+          <input id="vscode-file-path" placeholder="File path (e.g. backend/test.py)" style="width:70%;padding:6px 10px;border-radius:8px;border:1px solid #00eaff;background:#03131a;color:#bfefff;" />
+          <button id="open-in-vscode" class="btn" style="margin-left:6px;">Open in VS Code</button>
+        </div>
+        <div style="margin-top:10px;">
+          <textarea id="vscode-edit-content" placeholder="Edit file content here..." style="width:100%;height:60px;padding:6px 10px;border-radius:8px;border:1px solid #00eaff;background:#03131a;color:#bfefff;"></textarea>
+          <button id="edit-in-vscode" class="btn" style="margin-top:6px;float:right;">Save Edit</button>
+        </div>
+
+        <div id="vscode-action-status" style="color:#00eaff; font-size:13px; margin-top:8px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOBILE -->
+  <section id="mobile">
+    <div class="m-col">
+      <div class="m-reactor">
+        <div id="reactor-m" class="reactor">
+          <!-- Shockwave overlay (mobile) -->
+          <div class="shockwave" id="shockwave-m"></div>
+
+          <!-- Reactor SVG (mobile) -->
+          <svg viewBox="0 0 400 400">
+            <defs>
+              <radialGradient id="cyanGradM" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#00eaff" stop-opacity="1"/>
+                <stop offset="100%" stop-color="#00eaff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="160" fill="url(#cyanGradM)" opacity="0.12"/>
+
+            <g id="ring1-m" class="ring fly-in-top">
+              <circle cx="200" cy="200" r="140" fill="none" stroke="#00eaff55" stroke-width="3" stroke-dasharray="40 18 10 18"/>
+            </g>
+            <g id="ring2-m" class="ring fly-in-left">
+              <circle cx="200" cy="200" r="110" fill="none" stroke="#00eaffaa" stroke-width="4" stroke-dasharray="70 35"/>
+            </g>
+            <g id="ring3-m" class="ring fly-in-right">
+              <circle cx="200" cy="200" r="80"  fill="none" stroke="#7ff3ff"   stroke-width="3" stroke-dasharray="26 14"/>
+            </g>
+            <g id="ring4-m" class="ring fly-in-bottom">
+              <circle cx="200" cy="200" r="55"  fill="none" stroke="#ff3b3b"   stroke-width="7" stroke-dasharray="2 12" stroke-linecap="round"/>
+            </g>
+            <circle id="reactor-dot-m" cx="200" cy="200" r="14" fill="#ff3b3b" class="pulse-core" style="cursor:pointer;">
+              <animate attributeName="r" values="12;14;12" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+      </div>
+
+  <div class="sheet" id="mobile-sheet">
+<script>
+// ...existing code...
+let chatCount = 0;
+const mobileSheet = document.getElementById('mobile-sheet');
+function growMobileSheet() {
+  if (!mobileSheet) return;
+  chatCount++;
+  let newMax = 38 + Math.min(chatCount * 8, 22); // 38vh to 60vh max
+  mobileSheet.style.maxHeight = newMax + 'vh';
+}
+function updateTranscript(text) {
+  const transcriptEl = document.getElementById('transcript');
+  if (transcriptEl) transcriptEl.textContent = text;
+}
+function prependToLog(text) {
+  const logEl = document.getElementById('log');
+  if (logEl) {
+    const isMobile = window.innerWidth <= 768;
+    // Use a horizontal line for separation
+    const separator = '\n--------------------------------------------------------------------------------------------\n';
+    logEl.textContent = (text ? "Stella: " + text : "") + separator + logEl.textContent;
+  }
+}
+</script>
+        <div class="row">
+  <input id="text-m" placeholder="Ask Stella…" />
+  <button id="send-m" class="btn" style="padding:6px 10px;display:flex;align-items:center;justify-content:center;">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 16V4M10 4L5 9M10 4l5 5" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button id="pause-resume-btn" class="btn btn-small" style="display:none;margin-left:6px;align-items:center;justify-content:center;padding:6px 10px;"></button>
+</div>
+  <div style="position:relative;">
+    <span id="est-response-time" style="position:absolute;top:0;right:0;font-size:12px;color:#00eaff;background:transparent;padding:2px 8px;z-index:2;display:none;"></span>
+    <div id="log" class="log"></div>
+  </div>
+  <button id="pause-resume-btn" class="btn" style="display:none;margin-top:8px;">⏸</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const statusEl = $('#status');
+  const transcriptEl = $('#transcript');
+  const logEl = $('#log');
+
+
+  let pauseRequested = false;
+  let resumeRequested = false;
+  let currentAudio = null;
+  let currentReader = null;
+  const pauseBtn = document.getElementById('pause-resume-btn');
+
+  function showPauseBtn(show, paused) {
+    if (!pauseBtn) return;
+    pauseBtn.style.display = show ? '' : 'none';
+  // Use SVG icons for play and pause
+  pauseBtn.innerHTML = paused
+    ? `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="6,4 16,10 6,16" fill="black"/></svg>`
+    : `<svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="4" height="12" rx="1" fill="black"/><rect x="12" y="4" width="4" height="12" rx="1" fill="black"/></svg>`;
+  }
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', () => {
+      if (pauseRequested) {
+        resumeRequested = true;
+        pauseRequested = false;
+        showPauseBtn(true, false);
+        if (currentAudio) currentAudio.play();
+      } else {
+        pauseRequested = true;
+        resumeRequested = false;
+        showPauseBtn(true, true);
+        if (currentAudio) currentAudio.pause();
+      }
+    });
+  }
+
+  async function waitWhilePaused() {
+    while (pauseRequested && !resumeRequested) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  // Dynamic estimated response times for each model (running average of last 5)
+  const modelEstimates = {
+    'conversation': [13],
+    'coding': [25],
+    'fast': [11],
+    'balanced': [22]
+  };
+  function getAvg(model) {
+    const arr = modelEstimates[model] || [3];
+    return Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+  }
+  function addSample(model, seconds) {
+    if (!modelEstimates[model]) modelEstimates[model] = [seconds];
+    else {
+      modelEstimates[model].push(seconds);
+      if (modelEstimates[model].length > 5) modelEstimates[model].shift();
+    }
+  }
+
+  async function speak(text){
+    setState('speaking');
+    statusEl && (statusEl.textContent = 'Thinking…');
+    // Remove/hide thinking card if present
+    const thinkingCard = document.getElementById('thinking-card');
+    if (thinkingCard) thinkingCard.style.display = 'none';
+    const codeCard = document.getElementById('code-card');
+    const codeOutput = document.getElementById('code-output');
+    const modelSelect = document.getElementById('model-select');
+    const mode = modelSelect ? modelSelect.value : undefined;
+    if (codeCard && codeOutput) {
+      codeCard.style.display = 'none';
+      codeOutput.textContent = '';
+    }
+    // Show estimated response time
+    const estTimeEl = document.getElementById('est-response-time');
+    let estTime = 3;
+    if (modelSelect && modelSelect.value) {
+      estTime = getAvg(modelSelect.value);
+    }
+    if (estTimeEl) {
+      estTimeEl.textContent = `~${estTime}s`;
+      estTimeEl.style.display = '';
+    }
+    // Start timer for measuring real response time
+    const startTime = Date.now();
+    // Show 'Thinking...' in chat log (remove any previous thinking if present)
+    const logEl = document.getElementById('log');
+    if (logEl) {
+      // Remove previous 'Thinking...' if present at the top
+      if (logEl.textContent.startsWith('Stella: Thinking...')) {
+        logEl.textContent = logEl.textContent.replace(/^Stella: Thinking\.\.\.\n[-]+\n/, '');
+      }
+      // Prepend new 'Thinking...'
+      const separator = '\n------------------------------\n';
+      logEl.textContent = 'Stella: Thinking...'+separator+logEl.textContent;
+    }
+    try {
+      pauseRequested = false;
+      resumeRequested = false;
+      showPauseBtn(true, false);
+      // 1. Get AI response from backend (streaming)
+      const chatRes = await fetch('/api/nlp/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, mode })
+      });
+  if (!chatRes.body || !window.ReadableStream) {
+        // Fallback: not streaming capable
+        const chatData = await chatRes.json();
+        const aiText = chatData.response || '';
+        render(aiText);
+        if (mode === 'coding' && codeCard && codeOutput) {
+          codeCard.style.display = 'block';
+          codeOutput.textContent = aiText;
+        }
+        statusEl && (statusEl.textContent = 'Speaking…');
+        const ttsRes = await fetch('/api/tts/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: aiText })
+        });
+        const blob = await ttsRes.blob();
+        const audio = new Audio(URL.createObjectURL(blob));
+        currentAudio = audio;
+        await audio.play();
+        // Pause/resume logic for TTS only
+        while (!audio.ended) {
+          if (pauseRequested) await waitWhilePaused();
+          await new Promise(r => setTimeout(r, 100));
+        }
+        currentAudio = null;
+        showPauseBtn(false);
+        return aiText;
+      }
+      // Streaming response
+  let aiText = '';
+  let decoder = new TextDecoder();
+  const reader = chatRes.body.getReader();
+  currentReader = reader;
+  let done = false;
+  // (Reactor movement on mobile removed)
+      while (!done) {
+        if (pauseRequested) await waitWhilePaused();
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          aiText += chunk;
+          updateTranscript(aiText);
+          if (mode === 'coding' && codeCard && codeOutput) {
+            codeCard.style.display = 'block';
+            codeOutput.textContent = aiText;
+          }
+        }
+      }
+      currentReader = null;
+      showPauseBtn(false);
+      // When done, replace 'Thinking...' with response and grow sheet (mobile)
+      const logEl2 = document.getElementById('log');
+      const estTimeEl2 = document.getElementById('est-response-time');
+      // Calculate and store real response time
+      const endTime = Date.now();
+      const realSeconds = Math.round((endTime - startTime) / 1000);
+      if (modelSelect && modelSelect.value) addSample(modelSelect.value, realSeconds);
+      if (logEl2) {
+        // Only replace the first 'Thinking...' if present
+        if (logEl2.textContent.startsWith('Stella: Thinking...')) {
+          // Remove the first 'Thinking...' and separator
+          logEl2.textContent = logEl2.textContent.replace(/^Stella: Thinking\.\.\.\n[-]+\n/, '');
+        }
+        // Prepend the real response
+        const separator = '\n------------------------------\n';
+        logEl2.textContent = (aiText ? 'Stella: ' + aiText : '') + separator + logEl2.textContent;
+      }
+      if (estTimeEl2) estTimeEl2.style.display = 'none';
+      if (window.innerWidth <= 768) growMobileSheet();
+      // 2. Get TTS audio for AI response
+      statusEl && (statusEl.textContent = 'Speaking…');
+      const ttsRes = await fetch('/api/tts/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: aiText })
+      });
+      const blob = await ttsRes.blob();
+      const audio = new Audio(URL.createObjectURL(blob));
+      currentAudio = audio;
+      await audio.play();
+      while (!audio.ended) {
+        if (pauseRequested) await waitWhilePaused();
+        await new Promise(r => setTimeout(r, 100));
+      }
+      currentAudio = null;
+      showPauseBtn(false);
+      return aiText;
+    } catch (e) {
+      showPauseBtn(false);
+      render("Sorry—couldn’t play the response.");
+      console.error(e);
+    } finally {
+      showPauseBtn(false);
+      setState('idle');
+      statusEl && (statusEl.textContent = 'Ready');
+      // Hide thinking card
+      if (thinkingCard) thinkingCard.style.display = 'none';
+    }
+  }
+
+  function render(text){
+  updateTranscript(text);
+  prependToLog(text);
+  }
+
+  function setState(mode){
+    const r1 = $('#reactor'); const r2 = $('#reactor-m');
+    [r1,r2].forEach(r=>{
+      if(!r) return;
+      r.classList.remove('state-listening','state-speaking');
+      if(mode==='listening') r.classList.add('state-listening');
+      if(mode==='speaking')  r.classList.add('state-speaking');
+    });
+    // Mobile dot color
+    const dot = document.getElementById('reactor-dot-m');
+    if (dot) {
+      if (mode === 'listening') dot.setAttribute('fill', '#00eaff');
+      else dot.setAttribute('fill', '#ff3b3b');
+    }
+  }
+
+  // Buttons
+  $('#send')?.addEventListener('click', async ()=>{ const v = $('#text').value.trim(); if(!v) return; await speak(v); $('#text').value=''; });
+  $('#send-m')?.addEventListener('click', async ()=>{ const v = $('#text-m').value.trim(); if(!v) return; await speak(v); $('#text-m').value=''; });
+
+  // Send on Enter (desktop)
+  $('#text')?.addEventListener('keydown', async (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const v = $('#text').value.trim();
+      if(!v) return;
+      await speak(v);
+      $('#text').value='';
+    }
+  });
+
+  function startListen(inpSel){
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR){ alert('SpeechRecognition not supported'); return; }
+    const rec = new SR(); rec.lang='en-US';
+    setState('listening'); statusEl && (statusEl.textContent = 'Listening…');
+    rec.onresult = async (e)=>{ const phrase = e.results[0][0].transcript; const box = $(inpSel); if(box) box.value = phrase; await speak(phrase); };
+    rec.onerror = ()=>{ setState('idle'); statusEl&&(statusEl.textContent='Ready'); };
+    rec.onend   = ()=>{ setState('idle'); statusEl&&(statusEl.textContent='Ready'); };
+    rec.start();
+  }
+  $('#mic')?.addEventListener('click', ()=> startListen('#text'));
+const reactorDotM = document.getElementById('reactor-dot-m');
+if (reactorDotM) {
+  reactorDotM.addEventListener('click', () => {
+    reactorDotM.setAttribute('fill', '#00eaff');
+    startListen('#text-m');
+  });
+}
+  // ===== Assembly timing =====
+  // Fly-in durations: 0.6s each; delays: 0.10, 0.50, 0.90, 1.30
+  // Last ring ends ~ 1.90s. We add a small buffer then trigger spin + impact.
+  const ASSEMBLY_DONE_MS = 2000;
+
+  function enableSpinFor(prefix=""){
+    // Add spin classes only after assembly to avoid transform conflicts
+    const r1 = document.getElementById(`ring1${prefix}`);
+    const r2 = document.getElementById(`ring2${prefix}`);
+    const r3 = document.getElementById(`ring3${prefix}`);
+    const r4 = document.getElementById(`ring4${prefix}`);
+    r1 && r1.classList.add('spin-slow');
+    r2 && r2.classList.add('spin-mid');
+    r3 && r3.classList.add('spin-fast');
+    r4 && r4.classList.add('spin-mid');
+  }
+
+  function impactAndShockwave(reactorId, waveId){
+    const reactor = document.getElementById(reactorId);
+    const wave = document.getElementById(waveId);
+    if(reactor){ reactor.classList.remove('impact'); void reactor.offsetWidth; reactor.classList.add('impact'); }
+    if(wave){
+      wave.classList.remove('shockwave-animate'); void wave.offsetWidth; // restart
+      wave.classList.add('shockwave-animate');
+      wave.addEventListener('animationend', ()=> wave.classList.remove('shockwave-animate'), {once:true});
+    }
+  }
+
+  // VS Code integration (desktop only)
+  const vscodeStatus = document.getElementById('vscode-action-status');
+  const openBtn = document.getElementById('open-in-vscode');
+  const editBtn = document.getElementById('edit-in-vscode');
+  const filePathInput = document.getElementById('vscode-file-path');
+  const editContent = document.getElementById('vscode-edit-content');
+
+  if (openBtn && filePathInput) {
+    openBtn.addEventListener('click', async () => {
+      const path = filePathInput.value.trim();
+      if (!path) { vscodeStatus.textContent = 'Enter a file path.'; return; }
+      vscodeStatus.textContent = 'Opening in VS Code...';
+      const res = await fetch('/api/vscode/open', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ path })
+      });
+      const data = await res.json();
+      vscodeStatus.textContent = data.result || data.error || '';
+    });
+  }
+
+  if (editBtn && filePathInput && editContent) {
+    editBtn.addEventListener('click', async () => {
+      const path = filePathInput.value.trim();
+      const content = editContent.value;
+      if (!path) { vscodeStatus.textContent = 'Enter a file path.'; return; }
+      vscodeStatus.textContent = 'Saving edit...';
+      const res = await fetch('/api/vscode/edit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ path, content })
+      });
+      const data = await res.json();
+      vscodeStatus.textContent = data.result || data.error || '';
+    });
+  }
+
+  window.addEventListener('load', ()=>{
+    // Only greet if this is a new tab/session (not a reload)
+    let greeted = false;
+    function tryGreet() {
+      if (greeted) return;
+      greeted = true;
+      sessionStorage.setItem('stellaGreeted', '1');
+      speak("Good day, Sir. Initialization is complete and everything is running smoothly. I am ready to assist you with today’s work.");
+    }
+    // Only greet if not already greeted this session, and only after first user interaction
+    if (!sessionStorage.getItem('stellaGreeted')) {
+      window.addEventListener('pointerdown', tryGreet, { once: true });
+      window.addEventListener('keydown', tryGreet, { once: true });
+    }
+
+  // Immediately spin + impact + shockwave (desktop)
+  enableSpinFor('');
+  impactAndShockwave('reactor','shockwave');
+
+  // Mobile (if visible / present in DOM)
+  enableSpinFor('-m');
+  impactAndShockwave('reactor-m','shockwave-m');
+  });
+</script>
+</body>
+</html>

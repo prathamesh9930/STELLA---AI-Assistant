@@ -1,0 +1,42 @@
+# Stella AI Project Requirements
+
+## 1. Project Overview
+Stella is an AI assistant inspired by "Raphael" from "That Time I Got Reincarnated as a Slime." Stella will be capable of natural conversation, system automation, and intelligent task support, using free and open-source resources suitable for a university project.
+
+## 2. Functional Requirements
+- Conversational AI: Human-like chat, Q&A, and context-aware responses.
+- Voice/text input: Respond to both voice commands and text input.
+- System automation: Open apps, files, or windows on the user's system (with permission).
+- AI features: Analysis, recommendations, and basic reasoning.
+- User interface: Hybrid frontend (HTML/CSS/JS + React.js as needed).
+
+## 3. Non-Functional Requirements
+- Use only free/open-source tools and resources.
+- Must run on local machine, Google Colab, or similar free platforms.
+- Prioritize user safety, privacy, and ethical AI behavior.
+- Modular, maintainable, and well-documented codebase.
+
+## 4. Technology Stack
+- **Backend:** Python, PyTorch/TensorFlow, Hugging Face Transformers, OS automation libraries (pyautogui, os, subprocess, PowerShell)
+- **Frontend:** HTML, CSS, JavaScript, React.js (hybrid approach)
+- **Voice:** Vosk or Whisper (speech-to-text), ElevenLabs (optional, if free tier available)
+- **Data:** Open datasets for training/testing
+- **Dev Tools:** Git, Docker (optional), Jupyter/VS Code
+
+## 5. Compute Resources
+- Google Colab (free tier), Kaggle Kernels, or local machine
+- No paid cloud or hardware required
+
+## 6. Security & Ethics
+- User permission required for system access
+- Adhere to AI safety and ethical guidelines
+- No collection of sensitive data without consent
+
+## 7. Project Goals
+- Demonstrate a working AI assistant prototype
+- Showcase system automation and conversational abilities
+- Provide clear documentation and research summary
+
+---
+
+*Prepared for university research and demonstration purposes.*
