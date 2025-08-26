@@ -1,23 +1,55 @@
-# Stella AI
+
+# Stella AI Assistant
+
+<p align="center">
+   <a href="https://stella-ai-7492.onrender.com/" target="_blank"><img src="https://img.shields.io/badge/Live%20Demo-Online-green?style=for-the-badge&logo=vercel" alt="Live Demo"></a>
+   <a href="#features"><img src="https://img.shields.io/badge/Features-Explore-blue?style=for-the-badge" alt="Features"></a>
+   <a href="#mobile-features"><img src="https://img.shields.io/badge/Mobile%20Guide-Tap%20Here-orange?style=for-the-badge" alt="Mobile Guide"></a>
+</p>
+
+
 
 
 
 ## 🚀 Overview
-Stella AI is a modular, local AI assistant with a beautiful, futuristic UI inspired by sci-fi interfaces. It features voice interaction, memory, system integration, and multi-model support, all running locally for privacy and speed. Stella AI is optimized for both desktop and mobile, providing a seamless, visually stunning experience across devices.
+**Stella AI** is a modular, local AI assistant with a beautiful, futuristic UI inspired by sci-fi interfaces. It features voice interaction, memory, system integration, and multi-model support, all running locally for privacy and speed. Stella AI is optimized for both desktop and mobile, providing a seamless, visually stunning experience across devices.
 
 ---
 
+## 🖥️ Languages, Frameworks & Technologies
+- **Languages:** Python, JavaScript, HTML, CSS
+- **Frameworks/Libraries:** Flask, PyTorch, Hugging Face Transformers, pyttsx3, Vosk, Ollama
+- **Frontend:** Custom HTML/CSS/JS, SVG, responsive design
+- **Other:** Render.com (deployment), Git, VS Code
+
+---
+
+---
+
+
 ## ✨ Features
-- **Modular Flask Backend**: Clean, extensible Python backend with blueprints for NLP, TTS, STT, memory, and system integration.
-- **Ollama LLM Integration**: Local LLM inference with support for multiple models (Llama3, DeepSeek Coder, Mistral, Olmo2, etc.).
-- **Voice Interaction**: Local TTS (pyttsx3) and STT for hands-free operation.
-- **Streaming Responses**: Fast, incremental chat streaming for a natural conversation flow.
-- **Mobile-First UI**: Responsive design with a compact, scrollable chat card, sticky SVG reactor, and touch-optimized controls.
-- **Model Selection**: Easily switch between models; mobile defaults to the fastest (Mistral).
-- **Dynamic Estimated Response Time**: Shows real-time, model-based ETA for each response.
-- **Pause/Resume**: Instantly pause or resume both streaming and vocal responses.
-- **VS Code Integration**: (Desktop) Open and edit files directly from the chat.
-- **Customizable Starfield Background**: Immersive, animated galaxy background for a sci-fi feel.
+- Modular Flask backend (NLP, TTS, STT, memory, system integration)
+- Ollama LLM integration (Llama3, DeepSeek Coder, Mistral, Olmo2, etc.)
+- Local TTS (pyttsx3) and STT (Vosk)
+- Streaming chat responses
+- Model selection (desktop/mobile optimized)
+- Dynamic ETA for responses
+- Pause/resume streaming and voice
+- VS Code integration (desktop)
+- Customizable starfield background
+- **Mobile:** Touch-optimized, compact chat card, sticky SVG reactor, and more
+
+---
+
+## 📱 <span id="mobile-features"></span>Mobile Features
+- **Tap the red dot** (microphone) to speak to Stella (voice input)
+- **Compact chat card**: Scrollable, fixed max-height for easy reading
+- **Pause/Play**: Small SVG icon beside send button to pause/resume voice
+- **ETA**: See estimated response time at the top-right of chat card
+- **Model selection**: Defaults to fastest (Mistral) for best mobile experience
+- **Starfield background**: Full viewport, immersive sci-fi look
+
+---
 
 ---
 
