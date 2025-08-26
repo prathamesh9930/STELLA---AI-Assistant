@@ -1,11 +1,23 @@
 
+
 # Stella AI Assistant
 
 <p align="center">
-   <a href="https://stella-ai-7492.onrender.com/" target="_blank"><img src="https://img.shields.io/badge/Live%20Demo-Online-green?style=for-the-badge&logo=vercel" alt="Live Demo"></a>
-   <a href="#features"><img src="https://img.shields.io/badge/Features-Explore-blue?style=for-the-badge" alt="Features"></a>
-   <a href="#mobile-features"><img src="https://img.shields.io/badge/Mobile%20Guide-Tap%20Here-orange?style=for-the-badge" alt="Mobile Guide"></a>
+	<img src="https://img.shields.io/badge/LLM%20Engine-Ollama-4B275F?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama"/>
+	<img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+	<img src="https://img.shields.io/badge/Flask-Backend-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask"/>
+	<img src="https://img.shields.io/badge/Frontend-HTML5%20%7C%20CSS3%20%7C%20JS-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="Frontend"/>
+	<img src="https://img.shields.io/badge/LLMs-Llama3%20%7C%20Mistral%20%7C%20DeepSeek%20Coder%20%7C%20Olmo2-6A5ACD?style=for-the-badge" alt="LLMs"/>
+	<img src="https://img.shields.io/badge/Voice-TTS%20(gTTS%20%7C%20pyttsx3)%20%7C%20STT%20(Vosk)-FF69B4?style=for-the-badge" alt="Voice"/>
 </p>
+
+<div align="center" style="margin-bottom: 1em;">
+	<img src="https://skillicons.dev/icons?i=python,flask,html,css,js,git" alt="Tech stack"/>
+</div>
+
+
+
+
 
 
 
@@ -13,6 +25,32 @@
 
 ## 🚀 Overview
 **Stella AI** is a modular, local AI assistant with a beautiful, futuristic UI inspired by sci-fi interfaces. It features voice interaction, memory, system integration, and multi-model support, all running locally for privacy and speed. Stella AI is optimized for both desktop and mobile, providing a seamless, visually stunning experience across devices.
+
+---
+
+## 🖥️ Local Requirements
+
+- **Python 3.11+** (recommended)
+- **Ollama** (for local LLMs, e.g. Llama3, Mistral, DeepSeek Coder, Olmo2)
+- **Git**
+- **pip** (Python package manager)
+- **(Optional) VS Code** for development
+
+### Python dependencies (auto-installed):
+- torch
+- transformers
+- scikit-learn
+- numpy
+- pandas
+- flask
+- pyautogui
+- vosk
+- pyttsx3
+- gTTS
+
+See `requirements.txt` for the full list.
+
+---
 
 ---
 
@@ -88,35 +126,46 @@ Stella AI/
 
 ---
 
-## ⚡ Quick Start
-1. **Clone the repo:**
-   ```sh
-   git clone <your-repo-url>
-   cd "Stella AI"
-   ```
-2. **Create a virtual environment:**
-   ```sh
-   python -m venv venv
-   venv\Scripts\activate  # On Windows
-   # Or: source venv/bin/activate  # On Mac/Linux
-   ```
-3. **Install dependencies:**
-   ```sh
-   pip install -r requirements.txt
-   ```
-4. **Start Ollama server:**
-   ```sh
-   ollama serve
-   # Or to run a specific model:
-   ollama run mistral
-   ```
-5. **Run the Flask backend:**
-   ```sh
-   python -m backend.app
-   ```
-6. **Open in your browser:**
-   - Desktop: http://localhost:5000
-   - Mobile: Scan your local IP with your phone
+
+## ⚡ How to Run Locally
+
+### 1. Clone the repository
+```sh
+git clone https://github.com/prathamesh9930/STELLA---AI-Assistant.git
+cd "Stella AI"
+```
+
+### 2. Create and activate a virtual environment
+```sh
+python -m venv venv
+venv\Scripts\activate  # On Windows
+# Or: source venv/bin/activate  # On Mac/Linux
+```
+
+### 3. Install Python dependencies
+```sh
+pip install -r requirements.txt
+```
+
+### 4. Install and start Ollama (for LLMs)
+- Download and install Ollama from: https://ollama.com/download
+- Start the Ollama server:
+```sh
+ollama serve
+# Or to run a specific model:
+ollama run mistral
+```
+
+### 5. Run the Flask backend
+```sh
+python -m backend.app
+```
+
+### 6. Open Stella AI in your browser
+- Desktop: http://localhost:5000
+- Mobile: Open the same address on your phone (ensure both devices are on the same network)
+
+---
 
 ---
 
